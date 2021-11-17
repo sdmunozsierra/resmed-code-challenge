@@ -1,0 +1,4 @@
+# ignore vscode settings
+.vscode/
+# ignore python virtual environment
+venv/
