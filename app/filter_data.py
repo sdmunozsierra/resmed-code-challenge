@@ -1,5 +1,6 @@
 # module that filters an api call
 import argparse
+from calendar import isleap
 import json
 
 
@@ -79,22 +80,41 @@ class FilterData():
 
 
 def main():
+    default_filter = ["f1Results"]
 
     # Argparse to be called by command-line
     parser = argparse.ArgumentParser(add_help=True)
     parser.add_argument("-d", "--data", type=str, help="data")
-    parser.add_argument("-f", "--filter", type=str, help="filter")
+    parser.add_argument("-f", "--filter", type=str,
+                        default=default_filter,  help="filter")
     args = parser.parse_args()
-
-    my_data, my_filter = None
+    my_data, my_filter = [], []
     if args.data:
-        print("parsing data...")
         my_data = args.data
+        my_data.split(",")
+        if not isinstance(my_data, list):
+            my_data = [my_data]
     if args.filter:
-        print("filtering...")
         my_filter = args.filter
-        my_filter.replace(" ", ",").split(",")
+        my_filter.split(",")
+        if not isinstance(my_filter, list):
+            my_filter = [my_filter]
+    # print(res)
+    filtered = FilterData(my_data)
+    print("FILTERED ")
+    print(filtered.json_data)
+    print(type(filtered.json_data))
+    result1 = filtered.filterBy(my_filter)
+    print("Result1: {}".format(result1))
+    return
+    # for res in my_data:
+    #     print("RES", res)
+    #     # Create Object
+    #     filtered = FilterData(res)
+    #     result = filtered.filterBy(my_filter)
+    #     print(result)
+    # return
 
-    # Parse and Filter
-    filter_data = FilterData(my_data)
-    return filter_data.filterBy(my_filter)
+
+if __name__ == "__main__":
+    main()

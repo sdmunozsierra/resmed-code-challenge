@@ -1,4 +1,5 @@
 # Simple post api using aiohttp and asyncio
+from re import A
 import aiohttp
 import asyncio
 import argparse
@@ -36,31 +37,43 @@ class ApiService:
     async def _do_post(self, session, url, arg={}):
         async with session.post(url, json=arg) as response:
             data = await response.text()
-            print("Mydata!: {}\nIs type: {}".format(data, type(data)))
             return data
 
 
-# async def main():
-#     default_url = "https://ancient-wood-1161.getsandbox.com:443/results"
-#     # Argparse to be called by command-line
-#     parser = argparse.ArgumentParser(add_help=True)
-#     parser.add_argument("-x", "--post", type=str, help="post data")
-#     parser.add_argument("-u", "--urls", type=str,
-#                         default=default_url, help="target url")
-#     args = parser.parse_args()
+async def main():
+    """[Usage: api_service -urls "url1, url2" -x "pdata1, pdata2"]
 
-#     if args.post:
-#         my_post = args.post
-#     if args.urls:
-#         my_url = args.urls
+    :return: [Response data]
+    :rtype: [dict]
+    """
+    default_url = "https://ancient-wood-1161.getsandbox.com:443/results"
 
-#     # Create service
-#     service = await ApiService(my_url, my_post)
-#     # run one corutine
-#     response_data = await asyncio.run(service.post_call())
-#     print(response_data)
-#     return response_data
+    # Argparse to be called by command-line
+    parser = argparse.ArgumentParser(add_help=True)
+    parser.add_argument("--urls", type=str,
+                        default=default_url, help="Urls")
+    parser.add_argument("-x", "--post", type=str, default="",
+                        help="post data json format")
+    args = parser.parse_args()
+    my_urls, my_post = [], []
+    if args.urls:
+        my_urls = args.urls
+        my_urls.split(",")
+        if not isinstance(my_urls, list):
+            my_urls = [my_urls]
+    if args.post:
+        my_post = args.post
+        my_post.split(",")
+        if not isinstance(my_post, list):
+            my_post = [my_post]
+
+    # Create service
+    service = ApiService(my_urls, my_post)
+    # run as one corutine
+    response_data = await service.post_call()
+    print(response_data)
+    return response_data
 
 
-# if __name__ == "__main__":
-#     asyncio.run(main)
+if __name__ == "__main__":
+    asyncio.run(main())
