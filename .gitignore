@@ -2,3 +2,4 @@
 .vscode/
 # ignore python virtual environment
 venv/
+__pycache__/
