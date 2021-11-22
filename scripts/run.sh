@@ -29,6 +29,23 @@ function parse_params() {
 		test_directory=true
 		setting_test_directory="${1-}"
                 ;;
+            -cr | --chronological-reverse)
+		chronological=true
+		reverse=true
+                ;;
+            -c | --chronological)
+		chronological=true
+                ;;
+            -f | --filter)
+		filter=true
+		setting_filter="${1-}"
+                ;;
+            -l | --locale)
+		locale=true
+		locale_filter="${1-}"
+                ;;
+	- How can you confirm the code works?
+	- `./run.sh -tests`
         #     -h | --help)
         #         script_usage
         #         exit 0
@@ -128,11 +145,26 @@ function test_app() {
     fi
 }
 
+function _filter() {
+    if [[ -n ${filter-}  ]]; then 
+	pushd . > /dev/null
+	cd ../ 
+	local loc param
+	param=${setting_filter}
+	cmd="${parent}/app/filter.py ${param}"
+	echo "filtering by = ${param}"
+	# TODO:  replace by args_parse: run_app.py -filter $1 
+	python ${cmd}""
+	popd > /dev/null
+    fi
+}
+
 function main(){
     script_init "$@"
     parse_params "$@"
     set_venv
     set_requirements
+    _filter
     test_app
 }
 

@@ -8,13 +8,13 @@ Url: https://ancient-wood-1161.getsandbox.com:443/results
 Tasks:
 
 - Create python script that displays the sports results in reverse chronological order.
-  - `./run.sh -reverse-chronological`
+  - `./run.sh -chronological-reverse`
 - Add a parameter to the script to display only certain types or events (e.g. f1Results)
   - `./run.sh -filer f1Results`
 - Add a parameter to set the locale (e.g. en)
   - `./run.sh -set-locale en`
 - How can you confirm the code works?
-  - `./run.sh -tests`
+  - `./run.sh -t`
 - [x] Bonus: Implement the rest call asynchronously
 
 ## How to run
