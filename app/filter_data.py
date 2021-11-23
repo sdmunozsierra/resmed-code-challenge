@@ -116,12 +116,11 @@ class FilterData():
                         i = index
                         temp.insert(i, curr_date)
                         parsed_items.insert(i, item)
-            # temp = [self.dp.convert_reverse(x) for x in temp]
-            # print("Ordered: ", temp)
+            if reverse:
+                parsed_items.reverse()
             # Update dictionary with list with parsed_dates
             self.json_data[k] = parsed_items
         return self.json_data
-        pass
 
     def filterBy(self, keys):
         """[Filter by one or more keys. Return matches as k,v]

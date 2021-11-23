@@ -90,25 +90,5 @@ async def main():
             break
         print(DATA)
 
-#     if args.all:
-#         default_filter = ["f1Results"]
-#         default_filter_multi = ["f1Results", "Tennis"]
-#         # Only pass one target url as list
-#         service = ApiService(DEFAULT_URLS, [])
-#         responses = await service.post_call()
-#         for res in responses:
-#             print(res)
-#         filtered = FilterData(res)
-#         filtered._parse_data()
-#         filtered.convert_dates()
-#         filtered.order_by()
-#         filtered.convert_dates_strings()
-#         result1 = filtered.filterBy(default_filter)
-#         result2 = filtered.filterBy(default_filter_multi)
-#         print("Result1: {}".format(result1))
-#         print("Result2: {}".format(result2))
-#         return
-
-
 if __name__ == "__main__":
     asyncio.run(main())
