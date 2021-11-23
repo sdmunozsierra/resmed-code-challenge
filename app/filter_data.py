@@ -1,7 +1,9 @@
 # module that filters an api call
 import argparse
-from calendar import isleap
 import json
+from typing import OrderedDict
+from date_parser import DateParser
+from collections import OrderedDict
 
 
 class FilterData():
@@ -14,6 +16,7 @@ class FilterData():
         """
         self.raw_data = raw_data
         self.json_data = None
+        self.dp = DateParser()
         self._parse_data()
 
     def _parse_data(self):
@@ -30,6 +33,7 @@ class FilterData():
                 self.json_data = json.loads(self.raw_data)
                 print("Parsed data as dictionary")
                 # Here we can add extra parsing if needed.
+                assert(isinstance(self.json_data, dict))
             except:
                 print("Could not parse data into dictionary")
                 return 1
@@ -60,13 +64,68 @@ class FilterData():
             k: v for (k, v) in self.json_data.items() if filter_string in k}
         return filtered_dict
 
+    def convert_dates(self, date_key="publicationDate"):
+        for k, v in self.json_data.items():
+            parsed_items = []
+            for item in v:
+                if date_key in item:
+                    d = self.dp.convert(item[date_key])
+                    # d = list(map(lambda x: self.dp.convert(
+                    #     x), self.json_data[k][idx]))
+                    item[date_key] = d
+                    # print("Updated dict with list: ", d)
+                # Update list with parsed_dates
+                parsed_items.append(item)
+            # Update dictionary with list with parsed_dates
+            # print(parsed_items)
+            self.json_data[k] = parsed_items
+        return self.json_data
+
+    def __repr__(self) -> dict:
+        # Print json with dates
+        self.json_data
+
+    def order_by(self, order_key="publicationDate", reverse=True):
+        for k, v in self.json_data.items():
+            parsed_items = []
+            temp = []
+            for item in v:
+                if order_key in item:
+                    curr_date = item[order_key]
+                    print("currdate:", curr_date)
+                    if isinstance(curr_date, str):
+                        print("Skipping string instead of date")
+                        continue
+                    # BASE
+                    if len(temp) == 0:
+                        temp.append(curr_date)
+                        parsed_items.append(item)
+                    else:
+                        # Check the correct position to insert
+                        for i in range(len(parsed_items)):
+                            print("making comparison {} > {}".format(
+                                temp[i], curr_date))
+                            if temp[i] > curr_date:
+                                index = i
+                                print(index)
+                                break
+                        # Update list with parsed_dates
+                        i = index
+                        temp.insert(i, curr_date)
+                        parsed_items.insert(i, item)
+            print("temp: ", temp)
+            print("parsed_items: ", parsed_items)
+            # Update dictionary with list with parsed_dates
+            self.json_data[k] = parsed_items
+        return self.json_data
+        pass
+
     def filterBy(self, keys):
         """[Filter by one or more keys. Return matches as k,v]
 
         :param keys: [Keys to filter in the dictionary: Eg: f1Results]
         :type keys: [list]
         """
-        self._parse_data()  # Data might be unparsed
         num_matches = 0  # Debugging or extra information
         filtered_results = []
         for k in keys:
@@ -80,7 +139,7 @@ class FilterData():
 
 
 def main():
-    default_filter = ["f1Results"]
+    default_filter = "f1Results"
 
     # Argparse to be called by command-line
     parser = argparse.ArgumentParser(add_help=True)
@@ -88,6 +147,8 @@ def main():
     parser.add_argument("-f", "--filter", type=str,
                         default=default_filter,  help="filter")
     args = parser.parse_args()
+
+    # Parse arguments
     my_data, my_filter = [], []
     if args.data:
         my_data = args.data
@@ -99,21 +160,17 @@ def main():
         my_filter.split(",")
         if not isinstance(my_filter, list):
             my_filter = [my_filter]
-    # print(res)
+
+    # Create Object
     filtered = FilterData(my_data)
-    print("FILTERED ")
-    print(filtered.json_data)
-    print(type(filtered.json_data))
-    result1 = filtered.filterBy(my_filter)
-    print("Result1: {}".format(result1))
+    print("Loaded my_data to filter: {} with type {}".format(
+        filtered.json_data, type(my_filter)))
+    # Convert dates
+    filtered.convert_dates()
+    # Filter
+    result = filtered.filterBy(my_filter)
+    print("Filtered = f1Results: {}".format(result))
     return
-    # for res in my_data:
-    #     print("RES", res)
-    #     # Create Object
-    #     filtered = FilterData(res)
-    #     result = filtered.filterBy(my_filter)
-    #     print(result)
-    # return
 
 
 if __name__ == "__main__":

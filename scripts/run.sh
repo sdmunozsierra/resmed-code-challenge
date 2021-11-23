@@ -2,8 +2,11 @@
 # Create a virtual environment, install dependencies, run tests.
 
 # default location: root/venv
-# script location run example: root/scripts/script.sh -v Venv -r my-requirements.txt
+# script location run example: root/scripts/run.sh -v Venv -r my-requirements.txt
 # script install location: root/Venv
+
+# run and filter by key:
+# ./run.sh -u
 
 # DESC: Parameter parser
 # ARGS: $@ (optional): Arguments provided to the script
@@ -29,6 +32,15 @@ function parse_params() {
 		test_directory=true
 		setting_test_directory="${1-}"
                 ;;
+            -u | --urls)
+	    	# List of targets
+		urls=true
+		setting_urls="${1-}"
+                ;;
+            -x | --post)
+		post_data=true
+		setting_post_data="${1-}"
+                ;;
             -cr | --chronological-reverse)
 		chronological=true
 		reverse=true
@@ -38,14 +50,16 @@ function parse_params() {
                 ;;
             -f | --filter)
 		filter=true
-		setting_filter="${1-}"
+		setting_filter_key="${1-}"
                 ;;
+            -d | --data)
+		filter_data=true
+		setting_filter_data="${1-}"
+		;;
             -l | --locale)
 		locale=true
 		locale_filter="${1-}"
                 ;;
-	- How can you confirm the code works?
-	- `./run.sh -tests`
         #     -h | --help)
         #         script_usage
         #         exit 0
@@ -145,18 +159,107 @@ function test_app() {
     fi
 }
 
-function _filter() {
-    if [[ -n ${filter-}  ]]; then 
-	pushd . > /dev/null
-	cd ../ 
-	local loc param
-	param=${setting_filter}
-	cmd="${parent}/app/filter.py ${param}"
-	echo "filtering by = ${param}"
-	# TODO:  replace by args_parse: run_app.py -filter $1 
-	python ${cmd}""
-	popd > /dev/null
+function _set_url() {
+
+    local default param1 cmd
+    default="https://ancient-wood-1161.getsandbox.com:443/results" 
+    cmd="--urls"
+
+    if [[ -n ${urls-}  ]]; then 
+    	param1=${setting_urls-}
+	if [[ -n ${param1-} ]]; then cmd="${cmd} ${param1}"; else cmd="${cmd} ${default}"; fi
+    else
+	cmd="${cmd} ${default}"
     fi
+    echo $cmd
+
+}
+
+function _set_post(){
+
+    local param1 cmd
+    cmd="--post"
+
+    if [[ -n ${post_data-}  ]]; then 
+    	param1=${setting_post_data-}
+	if [[ -n ${param1-} ]]; then cmd="${cmd} ${param1}"; fi
+    else
+	cmd=""
+    fi
+    echo $cmd
+
+}
+
+function _do_post(){
+
+    # --urls --post
+    my_url=$(_set_url)
+    my_post=$(_set_post)
+    cmd="${parent}/app/api_service.py ${my_url} ${my_post}"
+    RESPONSE_DATA=$( python ${cmd} ) 
+    echo $RESPONSE_DATA
+}
+
+function post() {
+    if [[ -n ${urls-} ]]; then
+        _do_post
+    fi
+}
+
+function _set_filter() {
+
+    local default cmd param1
+    default="['f1Results']"
+    cmd="--filter"
+
+    if [[ -n ${filter-}  ]]; then 
+	param1=${setting_filter_data-}
+	if [[ -n ${param1-} ]]; then cmd="${cmd} ${param1} "; else cmd="${cmd} ${default}"; fi
+    else
+	cmd="${cmd} ${default}"
+    fi 
+    echo $cmd
+
+}
+
+function _set_response_data() {
+
+    local cmd param1 
+    cmd="--data"
+
+    if [[ -n ${RESPONSE_DATA-} ]]; then
+	cmd="${cmd} $RESPONSE_DATA"
+    elif [[ -n ${post_data-}  ]]; then 
+	param1=${setting_post_data-}
+	if [[ -n ${param1-} ]]; then cmd="${cmd} ${param1} "; fi
+    else
+	cmd=""
+    fi 
+    echo $cmd
+
+}
+
+function _do_filter() {
+
+    # --data --filter
+    my_data=$(_set_response_data)
+    my_filter=$(_set_filter)
+    cmd="${parent}/app/filter_data.py ${my_data} ${my_filter}"
+    #cmd="${parent}/app/filter_data.py -d ${RESPONSE_DATA} -f ['f1Results']"
+    echo "$cmd"
+    echo "my_data: $my_data"
+    echo "my_filter: $my_filter"
+    echo "cmd: $cmd"
+    FILTERED=$( python ${cmd} ) 
+    echo "FILTERED: $FILTERED"
+}
+
+function filter() {
+
+    if [[ -n ${filter-}  ]]; then 
+	_do_filter
+    fi 
+
 }
 
 function main(){
@@ -164,7 +267,8 @@ function main(){
     parse_params "$@"
     set_venv
     set_requirements
-    _filter
+    post
+    filter
     test_app
 }
 

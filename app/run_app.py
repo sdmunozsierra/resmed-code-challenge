@@ -21,9 +21,9 @@ async def main():
         for res in responses:
             print(res)
             filtered = FilterData(res)
-            print("FILTERED ")
-            print(filtered.json_data)
-            print(type(filtered.json_data))
+            filtered._parse_data()
+            filtered.convert_dates()
+            filtered.order_by()
             result1 = filtered.filterBy(default_filter)
             result2 = filtered.filterBy(default_filter_multi)
             print("Result1: {}".format(result1))

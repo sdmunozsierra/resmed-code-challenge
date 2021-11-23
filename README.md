@@ -20,7 +20,7 @@ Tasks:
 - Add a parameter to set the locale (e.g. en)
   - `./run.sh -url -set-locale en`
 - How can you confirm the code works?
-  - `./run.sh -t`
+  - `./run.sh -test`
 - [x] Bonus: Implement the rest call asynchronously
 
 ## How to run

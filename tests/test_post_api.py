@@ -8,6 +8,7 @@ import unittest
 from post_api import chronological_order
 import json
 
+
 class ApiData():
     def __init__(self, raw_data):
         self.raw_data = raw_data
@@ -52,12 +53,12 @@ class ApiData():
         """
         ordered1 = []
         # This orders by Date
-        try: 
+        try:
             # iterate each key (sports)
             for i in self.json_data:
                 # iterate item within the list (games)
                 #current_sport = i
-                ordered_games = []
+                ordered_games = OrderedDict()
                 for j in self.json_data[i]:
                     # Assert that we're a dictionary
                     assert(isinstance(j, dict))
@@ -66,13 +67,15 @@ class ApiData():
                         j[key] = self._parse_date(j[key])
                     # Parse the date before sorting
                     temp1, temp2 = None
-                    try: 
-                        temp1 = OrderedDict(sorted(self.json_data[i].items(), key=lambda t: t[0]))
+                    try:
+                        temp1 = OrderedDict(
+                            sorted(self.json_data[i].items(), key=lambda t: t[0]))
                     except Exception as e:
                         print("temp1")
                         print(e)
                     try:
-                        temp2 = OrderedDict(sorted(j.items(), key=lambda t: t[0]))
+                        temp2 = OrderedDict(
+                            sorted(j.items(), key=lambda t: t[0]))
                     except Exception as e:
                         print("temp2")
                         print(e)
@@ -85,51 +88,13 @@ class ApiData():
             print(e)
 
         # This orders by Sport:
-        ordered2 = OrderedDict(sorted(self.json_data.items(), key=lambda t: t[0]))
+        ordered2 = OrderedDict(
+            sorted(self.json_data.items(), key=lambda t: t[0]))
         print("Ordered1:")
         print(ordered1)
         print("Ordered2")
         print(ordered2)
-        return 1 
-
-    def _parse_date(self, str_date):
-        """[Parse string to a OrderDict List]
-
-        :param str_date: Date in String format "May 9, 2020 8:09:03 PM"
-        :type str_date: [str]
-        :return: [A Date object]
-        :rtype: [MyDate]
-        """
-        converted = None
-        try:
-            str_date = str_date.replace(",", "")
-            converted = datetime.strptime(str_date, "%B %d %Y %H:%M:%S %p")
-        except Exception as e:
-            print("Error converting date")
-            print(e)  
-        print(converted) 
-        return converted
-
-    def _convert_to_24_hour(self, tm, ampm):
-        """[Convert a time from 12 hours to 24 hours]
-
-        :param tm: [time format: 8:09:03]
-        :type tm: [str] enforce
-        :param ampm: [AM or PM]
-        :type ampm: [str]
-        :returns: 
-        """
-        raw_input = tm + ampm # hh:mm:ssAM/PM
-        print(raw_input)
-        t_splt = raw_input.split(':')
-        conv = int(t_splt[0])
-        print(type(conv))
-        if t_splt[2][2:] == 'PM' and t_splt[0] != '12':
-                t_splt[0] = str(12 + conv)
-        elif conv == 12 and t_splt[2][2:] == 'AM':
-            t_splt[0] = '00'
-        t_splt[2] = t_splt[2][:2]
-        return (':'.join(t_splt))
+        return 1
 
     def order_by_key(self, key, reverse=True):
         self._parse_data()
@@ -157,9 +122,10 @@ class TestStringMethods(unittest.TestCase):
             s.split(2)
 
     def test_chronological_order(self):
-        response_data = {"f1Results":[{"publicationDate":"May 9, 2020 8:09:03 PM","seconds":5.856,"tournament":"Silverstone Grand Prix","winner":"Lewis Hamilton"},{"publicationDate":"Apr 14, 2020 8:09:03 PM","seconds":7.729,"tournament":"VTB RUSSIAN GRAND PRIX","winner":"Valtteri Bottas"},{"publicationDate":"Mar 15, 2020 8:09:03 PM","seconds":5.856,"tournament":"Spa BELGIAN GRAND PRIX","winner":"Lewis Hamilton"}],"nbaResults":[{"gameNumber":6,"looser":"Heat","mvp":"Lebron James","publicationDate":"May 9, 2020 9:15:15 AM","tournament":"NBA playoffs","winner":"Lakers"},{"gameNumber":5,"looser":"Lakers","mvp":"Jimmy Butler","publicationDate":"May 7, 2020 3:15:00 PM","tournament":"NBA playoffs","winner":"Heat"},{"gameNumber":4,"looser":"Heat","mvp":"Anthony Davis","publicationDate":"May 5, 2020 1:34:15 PM","tournament":"NBA playoffs","winner":"Lakers"},{"gameNumber":3,"looser":"Lakers","mvp":"Jimmy Butler","publicationDate":"May 3, 2020 9:15:33 PM","tournament":"NBA playoffs","winner":"Heat"},{"gameNumber":2,"looser":"Heat","mvp":"Anthony Davis","publicationDate":"May 2, 2020 6:07:03 AM","tournament":"NBA playoffs","winner":"Lakers"}],"Tennis":[{"looser":"Schwartzman ","numberOfSets":3,"publicationDate":"May 9, 2020 11:15:15 PM","tournament":"Roland Garros","winner":"Rafael Nadal"},{"looser":"Stefanos Tsitsipas ","numberOfSets":3,"publicationDate":"May 9, 2020 2:00:40 PM","tournament":"Roland Garros","winner":"Novak Djokovic"},{"looser":"Petra Kvitova","numberOfSets":3,"publicationDate":"May 8, 2020 4:33:17 PM","tournament":"Roland Garros","winner":"Sofia Kenin"}]}
+        response_data = {"f1Results": [{"publicationDate": "May 9, 2020 8:09:03 PM", "seconds": 5.856, "tournament": "Silverstone Grand Prix", "winner": "Lewis Hamilton"}, {"publicationDate": "Apr 14, 2020 8:09:03 PM", "seconds": 7.729, "tournament": "VTB RUSSIAN GRAND PRIX", "winner": "Valtteri Bottas"}, {"publicationDate": "Mar 15, 2020 8:09:03 PM", "seconds": 5.856, "tournament": "Spa BELGIAN GRAND PRIX", "winner": "Lewis Hamilton"}], "nbaResults": [{"gameNumber": 6, "looser": "Heat", "mvp": "Lebron James", "publicationDate": "May 9, 2020 9:15:15 AM", "tournament": "NBA playoffs", "winner": "Lakers"}, {"gameNumber": 5, "looser": "Lakers", "mvp": "Jimmy Butler", "publicationDate": "May 7, 2020 3:15:00 PM", "tournament": "NBA playoffs", "winner": "Heat"}, {"gameNumber": 4, "looser": "Heat", "mvp": "Anthony Davis", "publicationDate": "May 5, 2020 1:34:15 PM",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "tournament": "NBA playoffs", "winner": "Lakers"}, {"gameNumber": 3, "looser": "Lakers", "mvp": "Jimmy Butler", "publicationDate": "May 3, 2020 9:15:33 PM", "tournament": "NBA playoffs", "winner": "Heat"}, {"gameNumber": 2, "looser": "Heat", "mvp": "Anthony Davis", "publicationDate": "May 2, 2020 6:07:03 AM", "tournament": "NBA playoffs", "winner": "Lakers"}], "Tennis": [{"looser": "Schwartzman ", "numberOfSets": 3, "publicationDate": "May 9, 2020 11:15:15 PM", "tournament": "Roland Garros", "winner": "Rafael Nadal"}, {"looser": "Stefanos Tsitsipas ", "numberOfSets": 3, "publicationDate": "May 9, 2020 2:00:40 PM", "tournament": "Roland Garros", "winner": "Novak Djokovic"}, {"looser": "Petra Kvitova", "numberOfSets": 3, "publicationDate": "May 8, 2020 4:33:17 PM", "tournament": "Roland Garros", "winner": "Sofia Kenin"}]}
         data = ApiData(response_data)
-        #clean_data.order_by_key("temp")
+        # clean_data.order_by_key("temp")
         data.main()
         self.assertTrue(False)
 
