@@ -89,11 +89,10 @@ class FilterData():
             self.json_data[k] = parsed_items
         return self.json_data
 
-    def __repr__(self) -> dict:
-        # Print json with dates
-        self.json_data
+    def __repr__(self) -> str:
+        return str(self.json_data)
 
-    def order_by(self, order_key="publicationDate", reverse=True):
+    def order_by(self, order_key="publicationDate", reverse=False):
         for k, v in self.json_data.items():
             parsed_items = []
             temp = []
@@ -117,9 +116,8 @@ class FilterData():
                         i = index
                         temp.insert(i, curr_date)
                         parsed_items.insert(i, item)
-
-            temp = [self.dp.convert_reverse(x) for x in temp]
-            print("Ordered: ", temp)
+            # temp = [self.dp.convert_reverse(x) for x in temp]
+            # print("Ordered: ", temp)
             # Update dictionary with list with parsed_dates
             self.json_data[k] = parsed_items
         return self.json_data
