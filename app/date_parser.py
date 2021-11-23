@@ -1,5 +1,4 @@
 import datetime
-
 # LOCAL_TIMEZONE = datetime.datetime.now(datetime.timedelta(0))).settimezone().datetime.tzinfo
 
 
@@ -14,7 +13,7 @@ class DateParser:
         :param str_date: Date in String format "May 9, 2020 8:09:03 PM"
         :type str_date: [str]
         :return: [A Date object]
-        :rtype: [MyDate]
+        :rtype: [datetime.datime]
         """
         converted = None
         if str_date:
@@ -22,36 +21,37 @@ class DateParser:
         try:
             converted = self.str_date.replace(",", "")
             converted = datetime.datetime.strptime(
-                converted, "%B %d %Y %I:%M:%S %p")
+                converted, "%b %d %Y %I:%M:%S %p")
         except Exception as e:
             print("Error converting date")
             print(e)
-        print("Converted date: ", converted)
+        # print("Converted date: ", converted)
         return converted
 
-    def _convert_to_24_hour(self, tm, ampm):
-        """[Convert a time from 12 hours to 24 hours]
+    def _parse_date_string(self, str_date=None):
+        """[Parse string to a OrderDict List]
 
-        :param tm: [time format: 8:09:03]
-        :type tm: [str] enforce
-        :param ampm: [AM or PM]
-        :type ampm: [str]
-        :returns: 
+        :param str_date: datetime.datetime(2020, 3, 15, 20, 9, 3)
+        :type str_date: [datetime.datetime]
+        :return: [A string with the date]
+        :rtype: [str]
         """
-        raw_input = tm + ampm  # hh:mm:ssAM/PM
-        print(raw_input)
-        t_splt = raw_input.split(':')
-        conv = int(t_splt[0])
-        print(type(conv))
-        if t_splt[2][2:] == 'PM' and t_splt[0] != '12':
-            t_splt[0] = str(12 + conv)
-        elif conv == 12 and t_splt[2][2:] == 'AM':
-            t_splt[0] = '00'
-        t_splt[2] = t_splt[2][:2]
-        return (':'.join(t_splt))
+        converted = None
+        if str_date:
+            self.str_date = str_date
+        try:
+            converted = self.str_date.strftime("%c")
+        except Exception as e:
+            print("Error converting date")
+            print(e)
+        # print("Converted date: ", converted)
+        return converted
 
     def convert(self, str_date):
         return self._parse_date(str_date)
+
+    def convert_reverse(self, str_date):
+        return self._parse_date_string(str_date)
 
 
 def main():

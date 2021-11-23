@@ -31,7 +31,6 @@ class FilterData():
         else:
             try:
                 self.json_data = json.loads(self.raw_data)
-                print("Parsed data as dictionary")
                 # Here we can add extra parsing if needed.
                 assert(isinstance(self.json_data, dict))
             except:
@@ -70,14 +69,23 @@ class FilterData():
             for item in v:
                 if date_key in item:
                     d = self.dp.convert(item[date_key])
-                    # d = list(map(lambda x: self.dp.convert(
-                    #     x), self.json_data[k][idx]))
                     item[date_key] = d
-                    # print("Updated dict with list: ", d)
                 # Update list with parsed_dates
                 parsed_items.append(item)
             # Update dictionary with list with parsed_dates
-            # print(parsed_items)
+            self.json_data[k] = parsed_items
+        return self.json_data
+
+    def convert_dates_strings(self, date_key="publicationDate"):
+        for k, v in self.json_data.items():
+            parsed_items = []
+            for item in v:
+                if date_key in item:
+                    d = self.dp.convert_reverse(item[date_key])
+                    item[date_key] = d
+                # Update list with parsed_dates
+                parsed_items.append(item)
+            # Update dictionary with list with parsed_dates
             self.json_data[k] = parsed_items
         return self.json_data
 
@@ -92,7 +100,6 @@ class FilterData():
             for item in v:
                 if order_key in item:
                     curr_date = item[order_key]
-                    print("currdate:", curr_date)
                     if isinstance(curr_date, str):
                         print("Skipping string instead of date")
                         continue
@@ -103,18 +110,16 @@ class FilterData():
                     else:
                         # Check the correct position to insert
                         for i in range(len(parsed_items)):
-                            print("making comparison {} > {}".format(
-                                temp[i], curr_date))
                             if temp[i] > curr_date:
                                 index = i
-                                print(index)
                                 break
                         # Update list with parsed_dates
                         i = index
                         temp.insert(i, curr_date)
                         parsed_items.insert(i, item)
-            print("temp: ", temp)
-            print("parsed_items: ", parsed_items)
+
+            temp = [self.dp.convert_reverse(x) for x in temp]
+            print("Ordered: ", temp)
             # Update dictionary with list with parsed_dates
             self.json_data[k] = parsed_items
         return self.json_data

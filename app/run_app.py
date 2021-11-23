@@ -24,6 +24,7 @@ async def main():
             filtered._parse_data()
             filtered.convert_dates()
             filtered.order_by()
+            filtered.convert_dates_strings()
             result1 = filtered.filterBy(default_filter)
             result2 = filtered.filterBy(default_filter_multi)
             print("Result1: {}".format(result1))
