@@ -25,6 +25,7 @@ class DateParser:
         except Exception as e:
             print("Error converting date")
             print(e)
+            return None
         # print("Converted date: ", converted)
         return converted
 
